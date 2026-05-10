@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SHAHENBEANS - نظام إدارة المخزون والمبيعات المتقدم">
+    <meta name="theme-color" content="#0b74ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <title>SHAHENBEANS - نظام إدارة المخزون والمبيعات</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="assets/css/variables.css">
+    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/dark-mode.css">
+    
+    <!-- Icons (using emoji for simplicity) -->
+    <style>
+        [data-icon]::before {
+            content: attr(data-icon);
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">🅿️</div>
+                <div class="sidebar-logo-text">
+                    <h2>SHAHENBEANS</h2>
+                    <p>نظام الإدارة</p>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="#dashboard" class="sidebar-nav-link active" data-page="dashboard">
+                        <span class="sidebar-nav-icon">📊</span>
+                        <span>لوحة التحكم</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#inventory" class="sidebar-nav-link" data-page="inventory">
+                        <span class="sidebar-nav-icon">📦</span>
+                        <span>المخزون</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#sales" class="sidebar-nav-link" data-page="sales">
+                        <span class="sidebar-nav-icon">💰</span>
+                        <span>المبيعات</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#invoices" class="sidebar-nav-link" data-page="invoices">
+                        <span class="sidebar-nav-icon">📄</span>
+                        <span>الفواتير</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#reports" class="sidebar-nav-link" data-page="reports">
+                        <span class="sidebar-nav-icon">📈</span>
+                        <span>التقارير</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#customers" class="sidebar-nav-link" data-page="customers">
+                        <span class="sidebar-nav-icon">👥</span>
+                        <span>العملاء</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#settings" class="sidebar-nav-link" data-page="settings">
+                        <span class="sidebar-nav-icon">⚙️</span>
+                        <span>الإعدادات</span>
+                    </a>
+                </li>
+            </nav>
+        </aside>
+        
+        <!-- Top Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="search-bar">
+                    <input type="text" id="globalSearch" placeholder="ابحث عن منتج أو فاتورة..." autocomplete="off">
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button class="notification-bell" id="notificationBtn" title="الإشعارات">
+                    🔔
+                    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                </button>
+                
+                <button class="btn icon-only" id="themToggle" title="تبديل الوضع">🌙</button>
+                
+                <div class="user-menu">
+                    <div class="user-info">
+                        <div class="user-name">المستخدم</div>
+                        <div class="user-role">مدير النظام</div>
+                    </div>
+                    <div class="avatar">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230b74ff'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="المستخدم">
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Dashboard Page -->
+            <div id="page-dashboard" class="page fade-in" style="display: block;">
+                <div class="page-header">
+                    <h1 class="page-title">لوحة التحكم</h1>
+                    <p class="page-subtitle">مرحبًا بك في نظام إدارة المخزون والمبيعات</p>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="grid grid-4" id="statsContainer">
+                    <div class="stat-card">
+                        <div class="stat-card-icon primary">📦</div>
+                        <div class="stat-card-label">إجمالي المنتجات</div>
+                        <div class="stat-card-value" id="totalProducts">0</div>
+                        <div class="stat-card-change positive">↑ 12% من الشهر الماضي</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-card-icon success">💰</div>
+                        <div class="stat-card-label">إجمالي المبيعات</div>
+                        <div class="stat-card-value" id="totalSales">0</div>
+                        <div class="stat-card-change positive">↑ 25% من الشهر الماضي</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-card-icon warning">💸</div>
+                        <div class="stat-card-label">الإيرادات الشهرية</div>
+                        <div class="stat-card-value" id="monthlyRevenue">0 ر.س</div>
+                        <div class="stat-card-change positive">↑ 18% من الشهر الماضي</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-card-icon danger">⚠️</div>
+                        <div class="stat-card-label">منخفضة المخزون</div>
+                        <div class="stat-card-value" id="lowStockCount">0</div>
+                        <div class="stat-card-change negative">↑ 5 منتجات تحتاج تجهيز</div>
+                    </div>
+                </div>
+                
+                <!-- Charts & Tables -->
+                <div class="grid grid-2" style="margin-top: var(--space-xl);">
+                    <!-- Recent Sales -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">آخر المبيعات</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>المنتج</th>
+                                            <th>الكمية</th>
+                                            <th>المبلغ</th>
+                                            <th>التاريخ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentSalesTable">
+                                        <tr>
+                                            <td colspan="4" style="text-align: center; color: var(--color-text-muted);">لا توجد مبيعات حتى الآن</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Products -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">أفضل المنتجات</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>المنتج</th>
+                                            <th>المبيعات</th>
+                                            <th>الإيرادات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="topProductsTable">
+                                        <tr>
+                                            <td colspan="3" style="text-align: center; color: var(--color-text-muted);">لا توجد بيانات حتى الآن</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Low Stock Alert -->
+                <div class="card" style="margin-top: var(--space-xl);">
+                    <div class="card-header">
+                        <h3 class="card-title">⚠️ المنتجات منخفضة المخزون</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>المنتج</th>
+                                        <th>المخزون الحالي</th>
+                                        <th>الحد الأدنى المتوقع</th>
+                                        <th>الحالة</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lowStockTable">
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; color: var(--color-text-muted);">جميع المنتجات بحالة جيدة ✓</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Inventory Page -->
+            <div id="page-inventory" class="page" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">المخزون</h1>
+                    <p class="page-subtitle">إدارة المنتجات والمخزون</p>
+                </div>
+                
+                <div style="margin-bottom: var(--space-lg); display: flex; gap: var(--space-md); flex-wrap: wrap;">
+                    <button class="btn primary" id="btnAddProduct">➕ إضافة منتج</button>
+                    <button class="btn" id="btnImportExcel">📥 استيراد Excel</button>
+                    <button class="btn" id="btnExportExcel">📤 تصدير Excel</button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">قائمة المنتجات</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>صورة</th>
+                                        <th>اسم المنتج</th>
+                                        <th>السعر</th>
+                                        <th>Office</th>
+                                        <th>Nology Store</th>
+                                        <th>Shipping</th>
+                                        <th>الإجمالي</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryTable">
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; color: var(--color-text-muted);">لا توجد منتجات حتى الآن</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sales Page -->
+            <div id="page-sales" class="page" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">المبيعات</h1>
+                    <p class="page-subtitle">تسجيل وإدارة المبيعات</p>
+                </div>
+                
+                <div class="grid grid-2">
+                    <!-- Add Sale Form -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">تسجيل بيع جديد</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="saleForm">
+                                <div class="form-group">
+                                    <label class="form-label">المنتج <span class="required">*</span></label>
+                                    <select id="saleProduct" class="form-control" required>
+                                        <option value="">اختر منتجاً...</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">الموقع <span class="required">*</span></label>
+                                    <select id="saleLocation" class="form-control" required>
+                                        <option value="office">Office</option>
+                                        <option value="nologyStore">Nology Store</option>
+                                        <option value="shipping">Shipping</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">الكمية <span class="required">*</span></label>
+                                    <input type="number" id="saleQuantity" class="form-control" min="1" value="1" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">طريقة الدفع</label>
+                                    <select id="saleMethod" class="form-control">
+                                        <option value="">اختر طريقة...</option>
+                                        <option value="cash">نقد</option>
+                                        <option value="card">بطاقة</option>
+                                        <option value="transfer">تحويل</option>
+                                        <option value="snoonu">Snoonu</option>
+                                        <option value="rafeeq">Rafeeq</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">التاريخ</label>
+                                    <input type="date" id="saleDate" class="form-control">
+                                </div>
+                                
+                                <button type="submit" class="btn primary" style="width: 100%;">💾 تسجيل البيع</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Sales Summary -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">ملخص المبيعات اليوم</h3>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: grid; gap: var(--space-md);">
+                                <div>
+                                    <div class="stat-card-label">عدد المبيعات</div>
+                                    <div class="stat-card-value" id="todaySalesCount">0</div>
+                                </div>
+                                <div>
+                                    <div class="stat-card-label">إجمالي المبيعات</div>
+                                    <div class="stat-card-value" id="todaySalesTotal">0 ر.س</div>
+                                </div>
+                                <div>
+                                    <div class="stat-card-label">متوسط قيمة البيع</div>
+                                    <div class="stat-card-value" id="todaySalesAverage">0 ر.س</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sales Table -->
+                <div class="card" style="margin-top: var(--space-lg);">
+                    <div class="card-header">
+                        <h3 class="card-title">سجل المبيعات</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>المنتج</th>
+                                        <th>الكمية</th>
+                                        <th>السعر</th>
+                                        <th>المبلغ</th>
+                                        <th>الموقع</th>
+                                        <th>الطريقة</th>
+                                        <th>التاريخ</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesTable">
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; color: var(--color-text-muted);">لا توجد مبيعات مسجلة</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reports Page -->
+            <div id="page-reports" class="page" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">التقارير</h1>
+                    <p class="page-subtitle">عرض وتحليل البيانات</p>
+                </div>
+                
+                <div style="margin-bottom: var(--space-lg); display: flex; gap: var(--space-md); flex-wrap: wrap; align-items: center;">
+                    <input type="month" id="reportMonth" class="form-control" style="max-width: 200px;">
+                    <button class="btn primary" id="btnGenerateReport">📊 توليد التقرير</button>
+                    <button class="btn" id="btnExportCSV">📥 تصدير CSV</button>
+                    <button class="btn" id="btnExportPDF">📄 تصدير PDF</button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">تقرير المبيعات</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>المنتج</th>
+                                        <th>المبيعات</th>
+                                        <th>الإيرادات</th>
+                                        <th>المتوسط</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportTable">
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; color: var(--color-text-muted);">اختر شهراً ثم اضغط "توليد التقرير"</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Page -->
+            <div id="page-settings" class="page" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">الإعدادات</h1>
+                    <p class="page-subtitle">إدارة إعدادات النظام</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">إدارة البيانات</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; gap: var(--space-md);">
+                            <div>
+                                <label class="form-label">النسخ الاحتياطي</label>
+                                <p class="form-text">قم بإنشاء نسخة احتياطية من جميع البيانات</p>
+                                <button class="btn primary" id="btnBackup" style="margin-top: var(--space-md);">💾 النسخ الاحتياطي</button>
+                            </div>
+                            <hr style="border: none; border-top: 1px solid var(--color-border-light); margin: var(--space-lg) 0;">
+                            <div>
+                                <label class="form-label">استعادة البيانات</label>
+                                <p class="form-text">استعادة البيانات من نسخة احتياطية سابقة</p>
+                                <input type="file" id="restoreFile" class="form-control" accept=".json" style="margin-top: var(--space-md);">
+                                <button class="btn" id="btnRestore" style="margin-top: var(--space-md);">📂 استعادة البيانات</button>
+                            </div>
+                            <hr style="border: none; border-top: 1px solid var(--color-border-light); margin: var(--space-lg) 0;">
+                            <div>
+                                <label class="form-label" style="color: var(--color-danger);">حذف جميع البيانات</label>
+                                <p class="form-text">حذف جميع البيانات محلياً (لا يمكن التراجع عن هذا الإجراء)</p>
+                                <button class="btn danger" id="btnClearAll" style="margin-top: var(--space-md);">🗑️ حذف جميع البيانات</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modals -->
+    <!-- Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title" id="productModalTitle">إضافة منتج جديد</h3>
+                <button class="modal-close" data-dismiss="modal">&times;</button>
+            </div>
+            <form id="productForm" class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">اسم المنتج <span class="required">*</span></label>
+                    <input type="text" id="productName" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">السعر <span class="required">*</span></label>
+                    <input type="number" id="productPrice" class="form-control" min="0" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">الصورة</label>
+                    <input type="file" id="productImage" class="form-control" accept="image/*">
+                    <img id="productImagePreview" src="" alt="معاينة" style="max-width: 100%; max-height: 200px; margin-top: var(--space-md); display: none; border-radius: var(--radius-lg);">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-md);">
+                    <div class="form-group">
+                        <label class="form-label">كمية Office</label>
+                        <input type="number" id="productOffice" class="form-control" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">كمية Nology</label>
+                        <input type="number" id="productNology" class="form-control" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">كمية Shipping</label>
+                        <input type="number" id="productShipping" class="form-control" min="0" value="0">
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-md); justify-content: flex-end; margin-top: var(--space-lg);">
+                    <button type="button" class="btn" data-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn primary">💾 حفظ المنتج</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="assets/js/locales/ar.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
