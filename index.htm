@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0b74ff" />
+    <meta name="description" content="تطبيق SHAHENBEANS - إدارة المنتجات والمبيعات اليومية والتقارير الشهرية - يعمل بالكامل داخل المتصفح" />
+    <title>SHAHENBEANS - تطبيق إدارة المبيعات</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- SheetJS لقراءة Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="container">
+            <div class="header-grid">
+                <div>
+                    <h1 id="appTitle">🌾 SHAHENBEANS</h1>
+                    <p class="subtitle">تطبيق إدارة المنتجات والمبيعات اليومية · يعمل بالكامل داخل المتصفح · حفظ محلي آمن</p>
+                    <div class="inventory-selector">
+                        <label for="inventoryMonth">تاريخ الجرد الحالي:</label>
+                        <input id="inventoryMonth" type="month" aria-label="اختر شهر الجرد" />
+                        <small id="inventoryMonthLabel"></small>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button id="btnAddProduct" class="btn primary" title="إضافة منتج جديد">➕ إضافة منتج</button>
+                    <label class="file-import" title="استيراد منتجات من ملف Excel">
+                        <input id="excelFileInput" type="file" accept=".xlsx,.xls" aria-label="اختر ملف Excel" />
+                        <span class="btn">📥 اختر ملف Excel</span>
+                    </label>
+                    <button id="btnImportExcel" class="btn" title="قراءة واستيراد البيانات من ملف Excel">📤 استيراد</button>
+                    <button id="btnClearAll" class="btn danger" title="حذف جميع البيانات المحفوظة محليًا">🗑️ مسح البيانات</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Inventory Panel -->
+        <section class="panel" id="inventoryPanel" aria-label="جرد المنتجات">
+            <h2>📦 جرد المنتجات</h2>
+            <div class="table-wrap" id="inventoryTableWrap">
+                <table id="productsTable" class="products-table" role="grid" aria-label="جدول المنتجات والكميات">
+                    <thead>
+                        <tr>
+                            <th scope="col">صورة</th>
+                            <th scope="col">اسم المنتج</th>
+                            <th scope="col">السعر</th>
+                            <th scope="col">Office</th>
+                            <th scope="col">Nology Store</th>
+                            <th scope="col">Shipping</th>
+                            <th scope="col">الإجمالي</th>
+                            <th scope="col">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTbody" aria-live="polite" aria-label="قائمة المنتجات"></tbody>
+                </table>
+            </div>
+            <p class="note">💡 الصور تُخزن محليًا في IndexedDB لضمان أداء أفضل وعدم امتلاء مساحة التخزين</p>
+        </section>
+
+        <!-- Sales Panel -->
+        <section class="panel" id="salesPanel" aria-label="تسجيل المبيعات اليومية">
+            <h2>💰 المبيعات اليومية</h2>
+
+            <!-- Sales Table -->
+            <div class="table-wrap" id="salesTableWrap">
+                <table class="products-table" id="salesTable" role="grid" aria-label="جدول سجلات المبيعات اليومية">
+                    <thead>
+                        <tr>
+                            <th scope="col">صورة</th>
+                            <th scope="col">المنتج</th>
+                            <th scope="col">الموقع</th>
+                            <th scope="col">الكمية</th>
+                            <th scope="col">طريقة البيع</th>
+                            <th scope="col">مبلغ البيع</th>
+                            <th scope="col">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTbody" aria-live="polite" aria-label="سجلات المبيعات"></tbody>
+                </table>
+            </div>
+
+            <!-- Sales Form -->
+            <form id="saleForm" class="form" aria-label="نموذج تسجيل البيع">
+                <div class="form-row">
+                    <label for="saleProduct">المنتج <span class="required">*</span></label>
+                    <select id="saleProduct" aria-required="true" aria-label="اختر المنتج المراد بيعه"></select>
+                </div>
+
+                <div class="form-row three-cols">
+                    <div style="display:flex;flex-direction:column;">
+                        <label for="saleLocation">الموقع <span class="required">*</span></label>
+                        <select id="saleLocation" aria-required="true" aria-label="اختر موقع البيع">
+                            <option value="office">Office</option>
+                            <option value="nologyStore">Nology Store</option>
+                            <option value="shipping">Shipping</option>
+                        </select>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;">
+                        <label for="saleQuantity">الكمية <span class="required">*</span></label>
+                        <input id="saleQuantity" type="number" min="1" value="1" aria-required="true" aria-label="أدخل الكمية المباعة" />
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;">
+                        <label for="saleDate">تاريخ البيع</label>
+                        <input id="saleDate" type="date" aria-label="اختر تاريخ البيع" />
+                    </div>
+
+                    <div class="sale-method">
+                        <label for="saleType">طريقة البيع</label>
+                        <select id="saleType" aria-label="اختر طريقة الدفع">
+                            <option value="">اختر طريقة البيع</option>
+                            <option value="cash">Cash - نقداً</option>
+                            <option value="snoonu">Snoonu</option>
+                            <option value="rafeeq">Rafeeq</option>
+                            <option value="website">Website - الموقع</option>
+                            <option value="card">Card - بطاقة</option>
+                            <option value="skip_cash">Skip Cash</option>
+                            <option value="fawran">Fawran</option>
+                            <option value="paylater">PayLater</option>
+                        </select>
+                    </div>
+
+                    <div style="display:flex;align-items:flex-end;justify-content:flex-end;">
+                        <button id="btnRecordSale" class="btn primary" type="button">✅ سجل البيع</button>
+                    </div>
+                </div>
+            </form>
+
+            <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-start;flex-wrap:wrap;">
+                <button id="btnClearSales" class="btn" title="مسح جميع سجلات المبيعات">🗑️ مسح المبيعات</button>
+            </div>
+        </section>
+
+        <!-- Monthly Report Panel -->
+        <section class="panel" id="monthlyReportPanel" aria-label="التقارير الشهرية">
+            <h2>📊 تقرير نهاية الشهر</h2>
+
+            <!-- Report Controls -->
+            <div class="form-row" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+                <div style="display:flex;flex-direction:column;">
+                    <label for="reportMonth">اختر الشهر</label>
+                    <input id="reportMonth" type="month" aria-label="اختر شهر التقرير" />
+                </div>
+                <button id="btnGenerateReport" class="btn primary" type="button">🔄 إنشاء التقرير</button>
+                <button id="btnExportCSV" class="btn" type="button">📊 تصدير CSV</button>
+                <button id="btnClearReport" class="btn" type="button">🗑️ مسح</button>
+            </div>
+
+            <!-- Reports Table -->
+            <div class="table-wrap" id="reportTableWrap" style="margin-top:20px;">
+                <table class="products-table" id="reportTable" role="grid" aria-label="جدول التقرير الشهري">
+                    <thead id="reportThead">
+                        <tr>
+                            <th scope="col">صورة</th>
+                            <th scope="col">المنتج</th>
+                            <th scope="col">مباع Office</th>
+                            <th scope="col">مباع Nology Store</th>
+                            <th scope="col">مباع Shipping</th>
+                            <th scope="col">الإجمالي المباع</th>
+                            <th scope="col">مبلغ المبيعات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTbody" aria-live="polite" aria-label="بيانات التقرير الشهري"></tbody>
+                    <tfoot id="reportTfoot" aria-label="إجماليات التقرير"></tfoot>
+                </table>
+
+                <!-- Top Products Section -->
+                <h3 style="margin-top:28px;margin-bottom:16px;">🏆 المنتجات الأكثر مبيعًا</h3>
+                <table class="products-table" id="topProductsTable" role="grid" aria-label="الدول الأكثر مبيعًا حسب الموقع والطريقة">
+                    <thead>
+                        <tr>
+                            <th scope="col">صورة</th>
+                            <th scope="col">المنتج</th>
+                            <th scope="col">الموقع</th>
+                            <th scope="col">طريقة البيع</th>
+                            <th scope="col">الكمية المباعة</th>
+                            <th scope="col">مبلغ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topProductsTbody" aria-live="polite" aria-label="أفضل المنتجات مبيعًا"></tbody>
+                </table>
+            </div>
+
+            <p class="note" id="reportNote" role="status">📝 اختر شهرًا ثم اضغط "إنشاء التقرير" لعرض تقرير المبيعات الشامل</p>
+        </section>
+
+        <!-- Import Log -->
+        <section class="panel import-log" id="importLog" aria-live="polite" hidden aria-label="نتائج الاستيراد">
+            <h3>✅ نتيجة الاستيراد</h3>
+            <div id="importMessage"></div>
+        </section>
+    </main>
+
+    <!-- Product Modal -->
+    <div class="modal" id="productModal" aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
+        <div class="modal-dialog">
+            <form id="productForm" class="form">
+                <h3 id="modalTitle">إضافة منتج</h3>
+
+                <div class="form-row">
+                    <label for="productName">اسم المنتج <span class="required">*</span></label>
+                    <input id="productName" type="text" required aria-required="true" aria-label="أدخل اسم المنتج" />
+                </div>
+
+                <div class="form-row">
+                    <label>صورة المنتج (رابط أو رفع)</label>
+                    <input id="productImageUrl" type="url" placeholder="https://مثال.com/صورة.jpg" aria-label="أدخل رابط الصورة" />
+                    <div class="or">أو</div>
+                    <input id="productImageFile" type="file" accept="image/*" aria-label="اختر صورة من جهازك" />
+                    <div class="preview">
+                        <img id="imagePreview" src="" alt="معاينة صورة المنتج" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="productPrice">السعر للوحدة (مثال: 12.50)</label>
+                    <input id="productPrice" type="number" step="0.01" min="0" value="0" aria-label="أدخل سعر المنتج" />
+                </div>
+
+                <div class="form-row three-cols">
+                    <div>
+                        <label for="qtyOffice">كمية Office</label>
+                        <input id="qtyOffice" type="number" min="0" value="0" aria-label="أدخل الكمية في Office" />
+                    </div>
+                    <div>
+                        <label for="qtyNology">كمية Nology Store</label>
+                        <input id="qtyNology" type="number" min="0" value="0" aria-label="أدخل الكمية في Nology Store" />
+                    </div>
+                    <div>
+                        <label for="qtyShipping">كمية Shipping</label>
+                        <input id="qtyShipping" type="number" min="0" value="0" aria-label="أدخل الكمية في Shipping" />
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">💾 حفظ</button>
+                    <button type="button" id="cancelModal" class="btn">❌ إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="container">
+            <small>🌾 SHAHENBEANS — تطبيق محترف يعمل بالكامل داخل المتصفح · حفظ محلي آمن · بدون تكاليف إضافية · محمي البيانات</small>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+    <script>
+        // Service Worker Registration for Offline Support
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(() => {
+                console.log('Service Worker registration optional');
+            });
+        }
+    </script>
+</body>
+
+</html>
